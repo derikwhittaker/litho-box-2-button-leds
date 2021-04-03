@@ -125,43 +125,49 @@ void cyclePower()
 
 void colorPinStateMachine()
 {
-  byte pinIs = digitalRead(COLOR_BUTTON_PIN);
+  if (!power_is_off)
+  {
+    
+    byte pinIs = digitalRead(COLOR_BUTTON_PIN);
 
-  switch (ledSwitchState)
-  {
-  case IS_OPEN:
-  {
-    if (pinIs == HIGH)
+    switch (ledSwitchState)
     {
-      ledSwitchState = IS_RISING;
+      case IS_OPEN:
+      {
+        if (pinIs == HIGH)
+        {
+          ledSwitchState = IS_RISING;
 
-      Serial.println(F("IS_OPEN - Is High... is rising"));
+          Serial.println(F("IS_OPEN - Is High... is rising"));
+        }
+        break;
+      }
+      case IS_RISING:
+      {
+        ledSwitchState = IS_CLOSED;
+        Serial.println(F("IS_RISING"));
+        break;
+      }
+      case IS_CLOSED:
+      {
+        if (pinIs == LOW)
+        {
+          ledSwitchState = IS_FALLING;
+          Serial.println(F("IS_CLOSED - Is Low... is falling"));
+        }
+        break;
+      }
+      case IS_FALLING:
+      {
+        cycleColor();
+        ledSwitchState = IS_OPEN;
+        Serial.println(F("IS_FALLING"));
+        break;
+      }
     }
-    break;
   }
-  case IS_RISING:
-  {
-    ledSwitchState = IS_CLOSED;
-    Serial.println(F("IS_RISING"));
-    break;
-  }
-  case IS_CLOSED:
-  {
-    if (pinIs == LOW)
-    {
-      ledSwitchState = IS_FALLING;
-      Serial.println(F("IS_CLOSED - Is Low... is falling"));
-    }
-    break;
-  }
-  case IS_FALLING:
-  {
-    cycleColor();
-    ledSwitchState = IS_OPEN;
-    Serial.println(F("IS_FALLING"));
-    break;
-  }
-  }
+
+
 }
 
 void powerPinStateMachine()
